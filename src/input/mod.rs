@@ -1,3 +1,3 @@
 mod hotkeys;
 
-pub use hotkeys::Hotkey;
+pub use hotkeys::{key_label, Hotkey};

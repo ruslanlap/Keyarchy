@@ -10,6 +10,12 @@ use crate::{
 
 use super::Page;
 
+#[derive(Debug, Clone)]
+pub struct PressedKey {
+    pub label: String,
+    pub held: bool,
+}
+
 #[derive(Debug)]
 pub struct State {
     pub page: Page,
@@ -21,6 +27,10 @@ pub struct State {
     pub store: Option<ProgressStore>,
     pub error: Option<String>,
     pub challenge_started: Instant,
+    pub pressed_keys: Vec<PressedKey>,
+    pub last_attempt: Vec<String>,
+    pub onboarding_step: usize,
+    pub show_hint: bool,
 }
 
 impl State {
@@ -35,11 +45,20 @@ impl State {
             Ok(_) => (Vec::new(), Some("No Hyprland bindings were found".into())),
             Err(error) => (Vec::new(), Some(error.to_string())),
         };
-        let current = select_next(&bindings, &progress, None);
+        let page = if progress.onboarding_complete || bindings.is_empty() {
+            Page::Practice
+        } else {
+            Page::Learn
+        };
+        let current = if page == Page::Learn {
+            Some(0)
+        } else {
+            select_next(&bindings, &progress, None)
+        };
 
         (
             Self {
-                page: Page::Practice,
+                page,
                 bindings,
                 current,
                 feedback: None,
@@ -48,6 +67,10 @@ impl State {
                 store,
                 error,
                 challenge_started: Instant::now(),
+                pressed_keys: Vec::new(),
+                last_attempt: Vec::new(),
+                onboarding_step: 0,
+                show_hint: false,
             },
             Task::none(),
         )
@@ -63,5 +86,55 @@ impl State {
                 self.error = Some(format!("Could not save progress: {error}"));
             }
         }
+    }
+
+    pub fn record_key_press(&mut self, label: String) {
+        if self
+            .pressed_keys
+            .iter()
+            .any(|key| key.label == label && key.held)
+        {
+            return;
+        }
+        self.pressed_keys.push(PressedKey { label, held: true });
+    }
+
+    pub fn record_key_release(&mut self, label: &str) {
+        if let Some(key) = self
+            .pressed_keys
+            .iter_mut()
+            .rev()
+            .find(|key| key.label == label && key.held)
+        {
+            key.held = false;
+        }
+    }
+
+    pub fn clear_attempt(&mut self) {
+        self.pressed_keys.clear();
+        self.feedback = None;
+        self.show_hint = false;
+        self.challenge_started = Instant::now();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::PressedKey;
+
+    #[test]
+    fn key_trace_keeps_each_press_and_release_state() {
+        let mut keys = vec![PressedKey {
+            label: "Super".into(),
+            held: true,
+        }];
+        keys[0].held = false;
+        keys.push(PressedKey {
+            label: "Super".into(),
+            held: true,
+        });
+        assert_eq!(keys.len(), 2);
+        assert!(!keys[0].held);
+        assert!(keys[1].held);
     }
 }

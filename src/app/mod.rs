@@ -15,6 +15,11 @@ pub fn subscription(_state: &State) -> Subscription<Message> {
         {
             Some(Message::KeyPressed(key, modifiers))
         }
+        iced::Event::Keyboard(keyboard::Event::KeyReleased { key, .. })
+            if status == event::Status::Ignored =>
+        {
+            Some(Message::KeyReleased(key))
+        }
         _ => None,
     })
 }

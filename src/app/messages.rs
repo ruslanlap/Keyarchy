@@ -13,7 +13,10 @@ pub enum Page {
 pub enum Message {
     Navigate(Page),
     KeyPressed(keyboard::Key, keyboard::Modifiers),
+    KeyReleased(keyboard::Key),
     NextChallenge,
+    ShowHint,
+    SkipChallenge,
     ReloadBindings,
     ResetProgress,
 }

@@ -4,6 +4,8 @@ Keyarchy is a Wayland-first desktop trainer for learning Omarchy and Hyprland
 keyboard shortcuts. It reads the shortcuts you actually use, presents focused
 practice challenges, and stores progress locally.
 
+![Keyarchy onboarding showing every pressed key](docs/screenshots/onboarding.png)
+
 ## Features
 
 - Native Rust desktop UI powered by [Iced](https://iced.rs/).
@@ -15,6 +17,7 @@ practice challenges, and stores progress locally.
 - XP, response-time scoring, streaks, per-shortcut accuracy, and weak-key view.
 - XDG-compliant JSON progress storage with atomic writes.
 - Dark Tokyo Night theme suitable for the Omarchy desktop.
+- Five-step onboarding with live keycaps for every pressed and released key.
 
 ## Install and run
 

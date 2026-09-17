@@ -28,17 +28,10 @@ impl Hotkey {
     }
 
     pub fn from_iced(key: Key, modifiers: Modifiers) -> Option<Self> {
-        let key = match key.as_ref() {
-            Key::Character(value) => normalize_key(value),
-            Key::Named(named) => {
-                let debug_name = format!("{named:?}");
-                if matches!(debug_name.as_str(), "Super" | "Control" | "Alt" | "Shift") {
-                    return None;
-                }
-                named_key(named)
-            }
-            Key::Unidentified => "unknown".into(),
-        };
+        let key = key_label(&key)?;
+        if matches!(key.as_str(), "Super" | "Ctrl" | "Alt" | "Shift") {
+            return None;
+        }
         Some(Self {
             super_key: modifiers.logo(),
             ctrl: modifiers.control(),
@@ -47,26 +40,44 @@ impl Hotkey {
             key,
         })
     }
+
+    pub fn parts(&self) -> Vec<String> {
+        let mut parts = Vec::new();
+        if self.super_key {
+            parts.push("Super".into());
+        }
+        if self.ctrl {
+            parts.push("Ctrl".into());
+        }
+        if self.alt {
+            parts.push("Alt".into());
+        }
+        if self.shift {
+            parts.push("Shift".into());
+        }
+        parts.push(self.key.clone());
+        parts
+    }
 }
 
 impl fmt::Display for Hotkey {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut parts = Vec::new();
-        if self.super_key {
-            parts.push("Super");
-        }
-        if self.ctrl {
-            parts.push("Ctrl");
-        }
-        if self.alt {
-            parts.push("Alt");
-        }
-        if self.shift {
-            parts.push("Shift");
-        }
-        parts.push(&self.key);
-        write!(formatter, "{}", parts.join(" + "))
+        write!(formatter, "{}", self.parts().join(" + "))
     }
+}
+
+pub fn key_label(key: &Key) -> Option<String> {
+    Some(match key.as_ref() {
+        Key::Character(value) => normalize_key(value),
+        Key::Named(named) => match format!("{named:?}").as_str() {
+            "Super" => "Super".into(),
+            "Control" => "Ctrl".into(),
+            "Alt" => "Alt".into(),
+            "Shift" => "Shift".into(),
+            _ => named_key(named),
+        },
+        Key::Unidentified => return None,
+    })
 }
 
 fn normalize_key(key: &str) -> String {

@@ -1,6 +1,6 @@
 use iced::{
     alignment,
-    widget::{button, column, container, horizontal_rule, text},
+    widget::{button, column, container, horizontal_rule, row, text},
     Element, Fill,
 };
 
@@ -8,6 +8,11 @@ use crate::app::{Message, State};
 
 pub fn view(state: &State) -> Element<'_, Message> {
     let content: Element<'_, Message> = if let Some(binding) = state.current_binding() {
+        let pressed = state
+            .pressed_keys
+            .iter()
+            .map(|key| (key.label.clone(), key.held))
+            .collect();
         let status: Element<'_, Message> = if let Some(feedback) = &state.feedback {
             let marker = if feedback.correct { "✓" } else { "×" };
             column![
@@ -22,8 +27,18 @@ pub fn view(state: &State) -> Element<'_, Message> {
             .into()
         } else {
             column![
-                text("waiting for shortcut…").size(17),
-                text("Keep this window focused and press the key combination.").size(14),
+                text("Live input").size(15),
+                super::keycaps(pressed),
+                if state.show_hint {
+                    text(format!("Hint: {}", binding.hotkey)).size(16)
+                } else {
+                    text("Every pressed key will appear here.").size(14)
+                },
+                row![
+                    button("Show keys").on_press(Message::ShowHint),
+                    button("Skip").on_press(Message::SkipChallenge),
+                ]
+                .spacing(10),
             ]
             .align_x(alignment::Horizontal::Center)
             .spacing(8)
@@ -35,6 +50,7 @@ pub fn view(state: &State) -> Element<'_, Message> {
             text("Press the matching hotkey").size(17),
             horizontal_rule(1),
             status,
+            text("Input is captured only while this window is focused.").size(12),
         ]
         .align_x(alignment::Horizontal::Center)
         .spacing(24)

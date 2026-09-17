@@ -9,6 +9,7 @@ use crate::{input::Hotkey, learning::AttemptResult};
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Progress {
+    pub onboarding_complete: bool,
     pub xp: u64,
     pub streak: u32,
     pub best_streak: u32,
