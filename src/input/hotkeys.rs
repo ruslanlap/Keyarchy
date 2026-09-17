@@ -16,7 +16,10 @@ impl Hotkey {
     pub fn parse(modifiers: &str, key: &str) -> Self {
         let modifiers = modifiers.to_ascii_uppercase();
         Self {
-            super_key: modifiers.contains("SUPER") || modifiers.contains("META"),
+            super_key: modifiers.contains("SUPER")
+                || modifiers.contains("META")
+                || modifiers.contains("MAINMOD")
+                || modifiers.contains("MOD4"),
             ctrl: modifiers.contains("CTRL") || modifiers.contains("CONTROL"),
             alt: modifiers.contains("ALT") || modifiers.contains("MOD1"),
             shift: modifiers.contains("SHIFT"),
