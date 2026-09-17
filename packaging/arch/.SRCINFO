@@ -1,0 +1,18 @@
+pkgbase = keyarchy
+	pkgdesc = Wayland-first Omarchy and Hyprland hotkey trainer
+	pkgver = 0.1.0
+	pkgrel = 1
+	url = https://github.com/ruslanlap/Keyarchy
+	arch = x86_64
+	arch = aarch64
+	license = MIT
+	makedepends = cargo
+	depends = gcc-libs
+	depends = glibc
+	depends = wayland
+	depends = libxkbcommon
+	options = !debug
+	source = keyarchy-0.1.0.tar.gz::https://github.com/ruslanlap/Keyarchy/archive/refs/tags/v0.1.0.tar.gz
+	sha256sums = 9659ac7fb9e0a69f8a38997964a4357330dc5c45a097ff30b3da658731cf3fb7
+
+pkgname = keyarchy

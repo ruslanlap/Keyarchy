@@ -4,30 +4,31 @@ pkgver=0.1.0
 pkgrel=1
 pkgdesc="Wayland-first Omarchy and Hyprland hotkey trainer"
 arch=('x86_64' 'aarch64')
-url="https://github.com/OWNER/keyarchy"
+url="https://github.com/ruslanlap/Keyarchy"
 license=('MIT')
-depends=('gcc-libs' 'wayland' 'libxkbcommon')
+depends=('gcc-libs' 'glibc' 'wayland' 'libxkbcommon')
 makedepends=('cargo')
+options=('!debug')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('SKIP')
+sha256sums=('9659ac7fb9e0a69f8a38997964a4357330dc5c45a097ff30b3da658731cf3fb7')
 
 prepare() {
-  cd "$pkgname-$pkgver"
-  cargo fetch --target "$CARCH-unknown-linux-gnu"
+  cd "Keyarchy-$pkgver"
+  cargo fetch --locked --target "$CARCH-unknown-linux-gnu"
 }
 
 build() {
-  cd "$pkgname-$pkgver"
+  cd "Keyarchy-$pkgver"
   CARGO_TARGET_DIR=target cargo build --frozen --release
 }
 
 check() {
-  cd "$pkgname-$pkgver"
-  CARGO_TARGET_DIR=target cargo test --frozen
+  cd "Keyarchy-$pkgver"
+  CARGO_TARGET_DIR=target cargo test --frozen --release
 }
 
 package() {
-  cd "$pkgname-$pkgver"
+  cd "Keyarchy-$pkgver"
   install -Dm755 target/release/keyarchy "$pkgdir/usr/bin/keyarchy"
   install -Dm644 assets/dev.keyarchy.Keyarchy.desktop \
     "$pkgdir/usr/share/applications/dev.keyarchy.Keyarchy.desktop"

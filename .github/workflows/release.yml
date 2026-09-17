@@ -119,9 +119,43 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  arch-package:
+    name: Build Arch package
+    needs: validate
+    runs-on: ubuntu-latest
+    container: archlinux:base-devel
+    timeout-minutes: 30
+    steps:
+      - name: Prepare Arch build environment
+        run: pacman -Syu --noconfirm --needed git sudo
+      - name: Checkout tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.validate.outputs.tag }}
+      - name: Create unprivileged package builder
+        run: |
+          useradd --create-home builder
+          echo 'builder ALL=(ALL:ALL) NOPASSWD: /usr/bin/pacman' > /etc/sudoers.d/builder
+          chown -R builder:builder packaging/arch
+      - name: Verify Arch package metadata
+        working-directory: packaging/arch
+        run: |
+          sudo -u builder makepkg --printsrcinfo > /tmp/keyarchy.SRCINFO
+          diff -u .SRCINFO /tmp/keyarchy.SRCINFO
+      - name: Build package
+        working-directory: packaging/arch
+        run: sudo -u builder makepkg --syncdeps --noconfirm --cleanbuild
+      - name: Upload Arch package
+        uses: actions/upload-artifact@v4
+        with:
+          name: arch-package-x86_64
+          path: packaging/arch/*.pkg.tar.zst
+          if-no-files-found: error
+          retention-days: 7
+
   publish:
     name: Publish GitHub Release
-    needs: [validate, package]
+    needs: [validate, package, arch-package]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

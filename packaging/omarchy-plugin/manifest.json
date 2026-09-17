@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "dev.keyarchy.launcher",
+  "name": "Keyarchy",
+  "version": "0.1.0",
+  "author": "Keyarchy contributors",
+  "license": "MIT",
+  "description": "Launch Keyarchy from the Omarchy bar",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "Keyarchy",
+    "description": "Launch the installed hotkey trainer",
+    "category": "Utilities",
+    "defaultSection": "right",
+    "allowMultiple": false
+  }
+}

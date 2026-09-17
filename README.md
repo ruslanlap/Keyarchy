@@ -85,10 +85,11 @@ git push origin v0.1.0
 
 The release workflow can also be run manually for an existing matching tag.
 
-## Arch package
+## Distribution
 
-`packaging/arch/PKGBUILD` is a source-package template. Update its source URL
-and checksum after publishing a tagged release, then build with `makepkg -si`.
+The validated Arch package recipe and Omarchy plugin scaffold live under
+`packaging/`. See [`packaging/README.md`](packaging/README.md) for local checks,
+release steps, and the current publication status of both channels.
 
 ## License
 
