@@ -58,6 +58,33 @@ The application is split into state/update logic, UI pages, input
 normalization, Hyprland parsing, learning/scoring, and persistence modules under
 `src/`.
 
+## CI/CD
+
+The GitHub Actions pipelines use a small set of explicit quality gates:
+
+1. **CI** runs on pull requests, pushes to `main`/`work`, and manual dispatches.
+   Formatting and Clippy run in parallel with the unit tests. Only after both
+   jobs pass are release binaries built for Linux x86-64 and ARM64 and retained
+   as workflow artifacts for seven days.
+2. **Release validation** starts for semantic-version tags such as `v0.1.0`.
+   It verifies that the tag matches the version in `Cargo.toml`, then repeats
+   formatting, lint, and test gates against the tagged source.
+3. **Packaging** creates per-architecture tarballs containing the executable,
+   desktop entry, README, and license. Every archive gets a SHA-256 checksum.
+4. **Publishing** downloads the packaged artifacts and creates the GitHub
+   Release with generated release notes. Only this final job receives
+   `contents: write`; all other jobs are read-only.
+
+To publish a release, update `Cargo.toml` and `Cargo.lock`, merge the change,
+and push the matching tag:
+
+```bash
+git tag -s v0.1.0 -m "Keyarchy v0.1.0"
+git push origin v0.1.0
+```
+
+The release workflow can also be run manually for an existing matching tag.
+
 ## Arch package
 
 `packaging/arch/PKGBUILD` is a source-package template. Update its source URL
